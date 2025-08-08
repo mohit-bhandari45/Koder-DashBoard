@@ -6,7 +6,6 @@ import { connectDatabase } from "./config/database.config";
 import cookieParser from "cookie-parser";
 import os from "os";
 import dashBoardRoutes from "./modules/dashboard/dashboard.routes";
-import { authCheck } from "./modules/middlewares/auth.middleware";
 
 const PORT = process.env.PORT || 4000;
 const app = express();
@@ -21,7 +20,6 @@ app.use(cors({
   credentials: true,
 }));
 app.use(cookieParser());
-app.use(authCheck);
 
 // routes
 app.use("/dashboard", dashBoardRoutes);
@@ -29,7 +27,7 @@ app.use("/dashboard", dashBoardRoutes);
 app.get("/", (req, res) => {
   res.status(200).json({
     status: "success",
-    message: "Code execution server is running 🚀",
+    message: "Code execution Dashboard is running 🚀",
     timestamp: new Date().toISOString(),
     system: {
       platform: os.platform(),                      // e.g., 'linux'
