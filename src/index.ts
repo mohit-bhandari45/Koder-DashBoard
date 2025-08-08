@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import cors from "cors";
 import { connectDatabase } from "./config/database.config";
@@ -6,7 +8,7 @@ import os from "os";
 import dashBoardRoutes from "./modules/dashboard/dashboard.routes";
 import { authCheck } from "./modules/middlewares/auth.middleware";
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 4000;
 const app = express();
 
 // Connect to database
