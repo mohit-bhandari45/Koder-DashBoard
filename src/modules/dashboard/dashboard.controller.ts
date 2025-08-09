@@ -4,6 +4,12 @@ import { makeResponse } from "../../utils/makeResponse.utils";
 import { getLanguageWiseSolvedProblems, getProgressSummary, getSkillWiseProgress } from "./dashboard.service";
 import SubmissionModel from "../models/submission.model";
 
+/**
+ * @desc Get overall progress summary for the authenticated user
+ * @method GET
+ * @route /dashboard/progress-summary
+ * @access Private
+ */
 export async function getProgressSummaryHandler(req: Request, res: Response): Promise<void> {
     try {
         const userId = req.user?._id as unknown as string;
@@ -26,6 +32,12 @@ export async function getProgressSummaryHandler(req: Request, res: Response): Pr
     }
 }
 
+/**
+ * @desc Get solved problem counts grouped by language for the authenticated user
+ * @method GET
+ * @route /dashboard/language-stats
+ * @access Private
+ */
 export async function getLanguageStatsHandler(req: Request, res: Response): Promise<void> {
     try {
         const userId = req.user?._id as unknown as string;
@@ -47,6 +59,12 @@ export async function getLanguageStatsHandler(req: Request, res: Response): Prom
     }
 }
 
+/**
+ * @desc Get skill-wise problem solving progress for the authenticated user
+ * @method GET
+ * @route /dashboard/skill-stats
+ * @access Private
+ */
 export async function getSkillStatsHandler(req: Request, res: Response) {
     try {
         const userId = req.user?._id as unknown as string;
@@ -68,6 +86,12 @@ export async function getSkillStatsHandler(req: Request, res: Response) {
     }
 }   
 
+/**
+ * @desc Get 15 most recent accepted submissions for the authenticated user
+ * @method GET
+ * @route /dashboard/recent-submissions
+ * @access Private
+ */
 export const getRecentSubmissions = async (req: Request, res: Response) => {
     try {
         const userId = req.user?._id;
@@ -91,5 +115,4 @@ export const getRecentSubmissions = async (req: Request, res: Response) => {
         console.error("Unexpected Error:", error);
         res.status(500).json(makeResponse("Internal Server Error"));
     }
-
 }
