@@ -23,7 +23,7 @@ export async function getProgressSummary(userId: string) {
         userId, status: "Accepted",
     });
 
-    const acceptanceRate = totalUserSubmissions > 0 ? (acceptedUserSubmissions / totalUserSubmissions) : 0;
+    const acceptanceRate = totalUserSubmissions > 0 ? (acceptedUserSubmissions / totalUserSubmissions)*100 : 0;
 
     const solvedProblemsByDifficulty = await ProblemModel.aggregate([
         {
