@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import ProblemModel from "../models/problem.model";
 import SubmissionModel from "../models/submission.model";
+import { skillTiers } from "./dashboard.utils";
 
 /**
  * @route /dashboard/progress-summary
@@ -106,11 +107,20 @@ export async function getSkillWiseProgress(userId: string) {
         })
     });
 
-    const skills = Object.entries(tagCount).map(([skill, count]) => ({
-        skill, count
-    }));
+    const tieredSkills: Record<"Advanced" | "Intermediate" | "Fundamental", { skill: string, count: number }[]> = {
+        Advanced: [],
+        Intermediate: [],
+        Fundamental: []
+    }
 
-    skills.sort((a, b) => b.count - a.count);
+    Object.entries(tagCount).forEach(([skill, count]) => {
+        const tier = skillTiers[skill] || "Fundamental";
+        tieredSkills[tier].push({ skill, count });
+    });
 
-    return { skills };
+    (Object.keys(tieredSkills) as (keyof typeof tieredSkills)[]).forEach(tier => {
+        tieredSkills[tier].sort((a, b) => b.count - a.count);
+    });
+
+    return tieredSkills;
 }
