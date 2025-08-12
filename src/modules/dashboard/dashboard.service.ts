@@ -68,7 +68,7 @@ export async function getLanguageWiseSolvedProblems(userId: string) {
         },
         {
             $group: {
-                _id: "$id.language",
+                _id: "$_id.language",
                 count: { $sum: 1 }
             }
         },
