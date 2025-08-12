@@ -18,8 +18,9 @@ Authorization: Bearer <token>
 
 
 **Sample Response:**
+```json
 {
-    "message": "Got the progress",
+"message": "Got the progress",
     "data": {
         "totalProblems": 50,
         "totalSolved": 30,
@@ -31,6 +32,7 @@ Authorization: Bearer <token>
         }
     }
 }
+```
 
 
 
@@ -43,7 +45,7 @@ Authorization: Bearer <token>
 **Access:** Private  
 
 **Sample Response:**
-
+```json
 {
     "message": "Got the progress",
     "data": {
@@ -63,7 +65,7 @@ Authorization: Bearer <token>
         ]
     }
 }
-
+```
 
 ---
 
@@ -74,6 +76,7 @@ Authorization: Bearer <token>
 **Access:** Private  
 
 **Sample Response:**
+```json
 {
   "message": "Got the skills progress",
   "data": {
@@ -91,7 +94,7 @@ Authorization: Bearer <token>
     ]
   }
 }
-
+```
 
 ---
 
@@ -102,6 +105,7 @@ Authorization: Bearer <token>
 **Access:** Private  
 
 **Sample Response:**
+```json
 {
   "message": "Got all submissions",
   "data": [
@@ -129,7 +133,7 @@ Authorization: Bearer <token>
     }
   ]
 }
-
+```
 ---
 
 ## 3. Error Responses
