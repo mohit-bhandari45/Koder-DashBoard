@@ -16,7 +16,9 @@ connectDatabase();
 // middlewares
 app.use(express.json());
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: process.env.NODE_ENV === "production"
+    ? "https://koder-frontend.vercel.app" // production frontend
+    : "http://localhost:3000",
   credentials: true,
 }));
 app.use(cookieParser());
