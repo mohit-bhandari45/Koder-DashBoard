@@ -18,14 +18,22 @@ Authorization: Bearer <token>
 
 
 **Sample Response:**
+```json
 {
 "message": "Got the progress",
-"data": {
-"totalProblems": 50,
-"solved": 30,
-"unsolved": 20
+    "data": {
+        "totalProblems": 50,
+        "totalSolved": 30,
+        "acceptanceRate": 20,
+        "byDifficulty": {
+            "easy": 15,
+            "medium": 10,
+            "hard": 5
+        }
+    }
 }
-}
+```
+
 
 
 ---
@@ -37,15 +45,27 @@ Authorization: Bearer <token>
 **Access:** Private  
 
 **Sample Response:**
-
+```json
 {
-"message": "Got the progress",
-"data": [
-{ "language": "javascript", "solvedCount": 15 },
-{ "language": "python", "solvedCount": 10 }
-]
+    "message": "Got the progress",
+    "data": {
+        "languages": [
+        {
+            "language": "Java",
+            "count": 15
+        },
+        {
+            "language": "Python",
+            "count": 10
+        },
+        {
+            "language": "C++",
+            "count": 5
+        }
+        ]
+    }
 }
-
+```
 
 ---
 
@@ -56,13 +76,25 @@ Authorization: Bearer <token>
 **Access:** Private  
 
 **Sample Response:**
+```json
 {
-"message": "Got the skills progress",
-"data": [
-{ "skill": "Dynamic Programming", "solved": 8, "total": 20 },
-{ "skill": "Arrays", "solved": 10, "total": 15 }
-]
+  "message": "Got the skills progress",
+  "data": {
+    "Advanced": [
+      { "skill": "Dynamic Programming", "count": 12 },
+      { "skill": "Graph Theory", "count": 7 }
+    ],
+    "Intermediate": [
+      { "skill": "Sorting", "count": 10 },
+      { "skill": "Two Pointers", "count": 6 }
+    ],
+    "Fundamental": [
+      { "skill": "Arrays", "count": 15 },
+      { "skill": "Strings", "count": 8 }
+    ]
+  }
 }
+```
 
 ---
 
@@ -73,20 +105,35 @@ Authorization: Bearer <token>
 **Access:** Private  
 
 **Sample Response:**
+```json
 {
-"message": "Got all submissions",
-"data": [
-{
-"_id": "64f1e43a27684",
-"problemId": "64e9c78f963aa",
-"language": "javascript",
-"code": "function example() { return 42; }",
-"status": "Accepted",
-"createdAt": "2025-08-08T18:23:00Z"
+  "message": "Got all submissions",
+  "data": [
+    {
+      "_id": "66bfa12345abc67890d12345",
+      "userId": "66be987654abc12345d67890",
+      "problemId": "66bd12345abc67890d987654",
+      "code": "public class Solution { public static void main(String[] args) { ... } }",
+      "language": "Java",
+      "status": "Accepted",
+      "createdAt": "2025-08-11T10:15:30.000Z",
+      "updatedAt": "2025-08-11T10:15:30.000Z",
+      "__v": 0
+    },
+    {
+      "_id": "66bfa12345abc67890d54321",
+      "userId": "66be987654abc12345d67890",
+      "problemId": "66bd54321abc67890d987654",
+      "code": "def solve(): print('Hello World')",
+      "language": "Python",
+      "status": "Accepted",
+      "createdAt": "2025-08-10T14:05:12.000Z",
+      "updatedAt": "2025-08-10T14:05:12.000Z",
+      "__v": 0
+    }
+  ]
 }
-]
-}
-
+```
 ---
 
 ## 3. Error Responses
