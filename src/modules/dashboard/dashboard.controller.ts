@@ -103,7 +103,7 @@ export const getRecentSubmissions = async (req: Request, res: Response) => {
         const recentAccepted = await SubmissionModel.find({
             userId,
             status: "Accepted"
-        }).sort({ createdAt: -1 }).limit(15);
+        }).populate("problemId").sort({ createdAt: -1 }).limit(15);
 
         res.status(200).json(makeResponse("Got all submissions", recentAccepted));
     } catch (error) {

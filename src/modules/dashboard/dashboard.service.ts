@@ -8,39 +8,76 @@ import { skillTiers } from "./dashboard.utils";
  * @method GET
  */
 export async function getProgressSummary(userId: string) {
-    const totalProblems = await ProblemModel.countDocuments();  // total problems
-    const solvedProblemIds = await SubmissionModel.distinct(
+    // 1. First Fetch all the user's accepted submissions(just problemIds)
+    /*  --> More memory-intensive and slower for large datasets.
+        
+        const submissions = await SubmissionModel.find({ userId, status: "Accepted" }, "problemId");
+        const solvedProblemIds = new Set(submissions.map(s => s.problemId));
+        const totalSolved = solvedProblemIds.size;
+    */
+    const solvedProblemIds: mongoose.Types.ObjectId[] = await SubmissionModel.distinct(
         "problemId",
         { userId, status: "Accepted" }
     );
-
     const totalSolved = solvedProblemIds.length;
 
-    // user total submission
-    const totalUserSubmissions = await SubmissionModel.countDocuments({ userId });
 
+    // 2. Total submissions by user
+    /*  --> Slower and more memory-intensive if there are many documents, because it retrieves all the documents, not just the count.
+        
+        const totalUserSubmissions = await SubmissionModel.find({ userId });
+        const total = totalUserSubmissions.length;
+    */
+    const totalUserSubmissions = await SubmissionModel.countDocuments();
+
+    // 3. Accepted User Submissions by user to calculate accuracy
     const acceptedUserSubmissions = await SubmissionModel.countDocuments({
-        userId, status: "Accepted",
+        userId,
+        status: "Accepted"
     });
 
-    const acceptanceRate = totalUserSubmissions > 0 ? (acceptedUserSubmissions / totalUserSubmissions)*100 : 0;
+    const acceptanceRate = totalUserSubmissions > 0 ? (acceptedUserSubmissions / totalUserSubmissions) * 100 : 0;
 
-    const solvedProblemsByDifficulty = await ProblemModel.aggregate([
+    // 4. Aggregate total problems and solved by difficulty
+    const difficultyAggragation = await ProblemModel.aggregate([
         {
-            $match: { _id: { $in: solvedProblemIds } }
-        },
-        {
-            $group: {
-                _id: "$difficulty",
-                count: { $sum: 1 },
+            $facet: {
+                totalByDifficulty: [
+                    { $group: { _id: "$difficulty", total: { $sum: 1 } } }
+                ],
+                solvedByDifficulty: [
+                    { $match: { _id: { $in: solvedProblemIds } } },
+                    { $group: { _id: "$difficulty", solved: { $sum: 1 } } },
+                ],
+                totalProblems: [
+                    { $count: "total" }
+                ]
             }
-        },
+        }
     ]);
 
-    const byDifficulty: Record<string, number> = {};
-    solvedProblemsByDifficulty.forEach((entry) => {
-        byDifficulty[entry._id.toLowerCase()] = entry.count; // normalize keys to lowercase
+    const aggResult = difficultyAggragation[0];
+
+    // 5. Map total problems by difficulty
+    const totalByDifficultyMap: Record<string, number> = {};
+    aggResult.totalByDifficulty.forEach((entry: any) => {
+        totalByDifficultyMap[entry._id.toLowerCase()] = entry.total;
     });
+
+    // 6. Map solved problems by difficulty
+    const solvedMap: Record<string, number> = {};
+    aggResult.solvedByDifficulty.forEach((entry: any) => {
+        solvedMap[entry._id.toLowerCase()] = entry.solved;
+    });
+
+    // 7. Combine solved and total per difficulty
+    const byDifficulty: Record<string, { solved: number; total: number }> = {};
+    ["easy", "medium", "hard"].forEach((diff) => {
+        byDifficulty[diff] = { solved: solvedMap[diff] || 0, total: totalByDifficultyMap[diff] || 0 }
+    });
+
+    // 8. Total problems overall
+    const totalProblems = aggResult.totalProblems[0]?.total || 0;
 
     return {
         totalProblems,
