@@ -17,7 +17,7 @@ export async function getProgressSummary(userId: string) {
     */
     const solvedProblemIds: mongoose.Types.ObjectId[] = await SubmissionModel.distinct(
         "problemId",
-        { userId, status: "Accepted" }
+        { userId: new mongoose.Types.ObjectId(userId), status: "Accepted" }
     );
     const totalSolved = solvedProblemIds.length;
 
@@ -29,12 +29,12 @@ export async function getProgressSummary(userId: string) {
         const total = totalUserSubmissions.length;
     */
     const totalUserSubmissions = await SubmissionModel.countDocuments({
-        userId
+        userId: new mongoose.Types.ObjectId(userId),
     });
 
     // 3. Accepted User Submissions by user to calculate accuracy
     const acceptedUserSubmissions = await SubmissionModel.countDocuments({
-        userId,
+        userId: new mongoose.Types.ObjectId(userId),
         status: "Accepted"
     });
 

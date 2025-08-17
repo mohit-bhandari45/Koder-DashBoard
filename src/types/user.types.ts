@@ -1,8 +1,6 @@
-import { ObjectId } from "mongoose";
-
 // Interface for User document
 export interface IUser {
-    _id: ObjectId;
+    _id: string;
     fullName: string;
     username: string;
     email: string;

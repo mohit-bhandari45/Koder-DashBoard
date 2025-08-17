@@ -3,6 +3,7 @@ import { AppError } from "../../utils/apperror.utils";
 import { makeResponse } from "../../utils/makeResponse.utils";
 import { getLanguageWiseSolvedProblems, getProgressSummary, getSkillWiseProgress } from "./dashboard.service";
 import SubmissionModel from "../models/submission.model";
+import mongoose from "mongoose";
 
 /**
  * @desc Get overall progress summary for the authenticated user
@@ -12,7 +13,7 @@ import SubmissionModel from "../models/submission.model";
  */
 export async function getProgressSummaryHandler(req: Request, res: Response): Promise<void> {
     try {
-        const userId = req.user?._id as unknown as string;
+        const userId = req.user?._id;
 
         if (!userId) {
             throw new AppError("Unauthorized", 401);
@@ -40,7 +41,7 @@ export async function getProgressSummaryHandler(req: Request, res: Response): Pr
  */
 export async function getLanguageStatsHandler(req: Request, res: Response): Promise<void> {
     try {
-        const userId = req.user?._id as unknown as string;
+        const userId = req.user?._id;
 
         if (!userId) {
             throw new AppError("Unauthorized", 401);
@@ -67,7 +68,7 @@ export async function getLanguageStatsHandler(req: Request, res: Response): Prom
  */
 export async function getSkillStatsHandler(req: Request, res: Response) {
     try {
-        const userId = req.user?._id as unknown as string;
+        const userId = req.user?._id;
 
         if (!userId) {
             return res.status(401).json({ error: "Unauthorized" });
@@ -84,7 +85,7 @@ export async function getSkillStatsHandler(req: Request, res: Response) {
         console.error("Unexpected Error:", error);
         res.status(500).json(makeResponse("Internal Server Error"));
     }
-}   
+}
 
 /**
  * @desc Get 15 most recent accepted submissions for the authenticated user
@@ -100,12 +101,21 @@ export const getRecentSubmissions = async (req: Request, res: Response) => {
             throw new AppError("Unauthorized", 401);
         }
 
-        const recentAccepted = await SubmissionModel.find({
-            userId,
-            status: "Accepted"
-        }).populate("problemId").sort({ createdAt: -1 }).limit(15);
+        const recentAccepted = await SubmissionModel.aggregate([
+            { $match: { userId: new mongoose.Types.ObjectId(userId), status: "Accepted" } },
+            { $sort: { createdAt: -1 } },
+            {
+                $group: {
+                    _id: "$problemId",
+                    latestSubmission: { $first: "$$ROOT" }
+                }
+            },
+            { $replaceRoot: { newRoot: "$latestSubmission" } },
+            { $limit: 15 }
+        ]);
 
-        res.status(200).json(makeResponse("Got all submissions", recentAccepted));
+        const populated = await SubmissionModel.populate(recentAccepted, { path: "problemId" });
+        res.status(200).json(makeResponse("Got all submissions", populated));
     } catch (error) {
         if (error instanceof AppError) {
             res.status(error.statusCode).json(makeResponse(error.message));

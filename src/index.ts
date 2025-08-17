@@ -15,12 +15,6 @@ connectDatabase();
 
 // middlewares
 app.use(express.json());
-app.use(cors({
-  origin: process.env.NODE_ENV === "production"
-    ? "https://specified-peacock-mohit123-1b61bd1c.koyeb.app" // production frontend
-    : "http://localhost:4000",
-  credentials: true,
-}));
 app.use(cookieParser());
 
 // routes
