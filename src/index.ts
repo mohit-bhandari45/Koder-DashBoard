@@ -17,8 +17,8 @@ connectDatabase();
 app.use(express.json());
 app.use(cors({
   origin: process.env.NODE_ENV === "production"
-    ? "https://koder-frontend.vercel.app" // production frontend
-    : "http://localhost:3000",
+    ? "https://specified-peacock-mohit123-1b61bd1c.koyeb.app" // production frontend
+    : "http://localhost:4000",
   credentials: true,
 }));
 app.use(cookieParser());

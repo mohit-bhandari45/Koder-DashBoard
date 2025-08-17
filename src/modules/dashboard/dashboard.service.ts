@@ -28,7 +28,9 @@ export async function getProgressSummary(userId: string) {
         const totalUserSubmissions = await SubmissionModel.find({ userId });
         const total = totalUserSubmissions.length;
     */
-    const totalUserSubmissions = await SubmissionModel.countDocuments();
+    const totalUserSubmissions = await SubmissionModel.countDocuments({
+        userId
+    });
 
     // 3. Accepted User Submissions by user to calculate accuracy
     const acceptedUserSubmissions = await SubmissionModel.countDocuments({
@@ -36,7 +38,7 @@ export async function getProgressSummary(userId: string) {
         status: "Accepted"
     });
 
-    const acceptanceRate = totalUserSubmissions > 0 ? (acceptedUserSubmissions / totalUserSubmissions) * 100 : 0;
+    const acceptanceRate = Math.ceil(totalUserSubmissions > 0 ? (acceptedUserSubmissions / totalUserSubmissions) * 100 : 0);
 
     // 4. Aggregate total problems and solved by difficulty
     const difficultyAggragation = await ProblemModel.aggregate([
@@ -82,6 +84,7 @@ export async function getProgressSummary(userId: string) {
     return {
         totalProblems,
         totalSolved,
+        totalUserSubmissions,
         acceptanceRate,
         byDifficulty
     }
