@@ -98,7 +98,7 @@ export async function getProgressSummary(userId: string): Promise<IGetProgressSu
         byDifficulty,
     };
 
-    await setCache<IGetProgressSummary>(cacheKey, summary, 120);
+    await setCache<IGetProgressSummary>(cacheKey, summary, 60);
     return summary;
 }
 
@@ -142,8 +142,8 @@ export async function getLanguageWiseSolvedProblems(
 
     const response: ILanguageWiseSolvedProblemsResponse = { languages: results };
 
-    // 3️⃣ Saving result in Redis for 120 seconds
-    await setCache<ILanguageWiseSolvedProblemsResponse>(cacheKey, response, 120); // TTL = 120s
+    // 3️⃣ Saving result in Redis for 60 seconds
+    await setCache<ILanguageWiseSolvedProblemsResponse>(cacheKey, response, 60); // TTL = 60s
 
     return response;
 }
@@ -188,8 +188,8 @@ export async function getSkillWiseProgress(userId: string): Promise<ISkillWisePr
         tieredSkills[tier].sort((a, b) => b.count - a.count);
     });
 
-    // 3️⃣ Saving in Redis with TTL (120 seconds)
-    await setCache<ISkillWiseProgress>(cacheKey, tieredSkills, 120);
+    // 3️⃣ Saving in Redis with TTL (60 seconds)
+    await setCache<ISkillWiseProgress>(cacheKey, tieredSkills, 60);
 
     return tieredSkills;
 }

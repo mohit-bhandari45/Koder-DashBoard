@@ -13,25 +13,25 @@ import { getCache, setCache } from "../../lib/cache.lib";
  * @access Private
  */
 export async function getProgressSummaryHandler(req: Request, res: Response): Promise<void> {
-    try {
-        const userId = req.user?._id;
+  try {
+    const userId = req.user?._id;
 
-        if (!userId) {
-            throw new AppError("Unauthorized", 401);
-        }
-
-        const summary = await getProgressSummary(userId);
-
-        res.status(200).json(makeResponse("Got the progress", summary));
-    } catch (error) {
-        if (error instanceof AppError) {
-            res.status(error.statusCode).json(makeResponse(error.message));
-            return;
-        }
-
-        console.error("Unexpected Error:", error);
-        res.status(500).json(makeResponse("Internal Server Error"));
+    if (!userId) {
+      throw new AppError("Unauthorized", 401);
     }
+
+    const summary = await getProgressSummary(userId);
+
+    res.status(200).json(makeResponse("Got the progress", summary));
+  } catch (error) {
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json(makeResponse(error.message));
+      return;
+    }
+
+    console.error("Unexpected Error:", error);
+    res.status(500).json(makeResponse("Internal Server Error"));
+  }
 }
 
 /**
@@ -41,24 +41,24 @@ export async function getProgressSummaryHandler(req: Request, res: Response): Pr
  * @access Private
  */
 export async function getLanguageStatsHandler(req: Request, res: Response): Promise<void> {
-    try {
-        const userId = req.user?._id;
+  try {
+    const userId = req.user?._id;
 
-        if (!userId) {
-            throw new AppError("Unauthorized", 401);
-        }
-        const data = await getLanguageWiseSolvedProblems(userId);
-
-        res.status(200).json(makeResponse("Got the progress", data));
-    } catch (error) {
-        if (error instanceof AppError) {
-            res.status(error.statusCode).json(makeResponse(error.message));
-            return;
-        }
-
-        console.error("Unexpected Error:", error);
-        res.status(500).json(makeResponse("Internal Server Error"));
+    if (!userId) {
+      throw new AppError("Unauthorized", 401);
     }
+    const data = await getLanguageWiseSolvedProblems(userId);
+
+    res.status(200).json(makeResponse("Got the progress", data));
+  } catch (error) {
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json(makeResponse(error.message));
+      return;
+    }
+
+    console.error("Unexpected Error:", error);
+    res.status(500).json(makeResponse("Internal Server Error"));
+  }
 }
 
 /**
@@ -68,24 +68,24 @@ export async function getLanguageStatsHandler(req: Request, res: Response): Prom
  * @access Private
  */
 export async function getSkillStatsHandler(req: Request, res: Response) {
-    try {
-        const userId = req.user?._id;
+  try {
+    const userId = req.user?._id;
 
-        if (!userId) {
-            return res.status(401).json({ error: "Unauthorized" });
-        }
-
-        const data = await getSkillWiseProgress(userId);
-        res.status(200).json(makeResponse("Got the skills progress", data));
-    } catch (error) {
-        if (error instanceof AppError) {
-            res.status(error.statusCode).json(makeResponse(error.message));
-            return;
-        }
-
-        console.error("Unexpected Error:", error);
-        res.status(500).json(makeResponse("Internal Server Error"));
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized" });
     }
+
+    const data = await getSkillWiseProgress(userId);
+    res.status(200).json(makeResponse("Got the skills progress", data));
+  } catch (error) {
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json(makeResponse(error.message));
+      return;
+    }
+
+    console.error("Unexpected Error:", error);
+    res.status(500).json(makeResponse("Internal Server Error"));
+  }
 }
 
 /**
@@ -100,10 +100,13 @@ export const getRecentSubmissions = async (req: Request, res: Response) => {
     if (!userId) throw new AppError("Unauthorized", 401);
 
     const cacheKey = `dashboard:recentSubmissions:${userId}`;
+    console.time("RecentSubmissions");
 
     // 1️⃣ Try cache first
     const cached = await getCache<any[]>(cacheKey);
+    console.log(cached);
     if (cached) {
+      console.timeEnd("RecentSubmissions");
       return res.status(200).json(makeResponse("Got all submissions (cached)", cached));
     }
 
@@ -125,6 +128,7 @@ export const getRecentSubmissions = async (req: Request, res: Response) => {
 
     // 3️⃣ Save in Redis with short TTL (e.g., 30s)
     await setCache(cacheKey, populated, 30);
+    console.timeEnd("RecentSubmissions");
 
     res.status(200).json(makeResponse("Got all submissions", populated));
   } catch (error) {
