@@ -4,6 +4,7 @@ import { makeResponse } from "../../utils/makeResponse.utils";
 import { getLanguageWiseSolvedProblems, getProgressSummary, getSkillWiseProgress } from "./dashboard.service";
 import SubmissionModel from "../models/submission.model";
 import mongoose from "mongoose";
+import { getCache, setCache } from "../../lib/cache.lib";
 
 /**
  * @desc Get overall progress summary for the authenticated user
@@ -94,35 +95,43 @@ export async function getSkillStatsHandler(req: Request, res: Response) {
  * @access Private
  */
 export const getRecentSubmissions = async (req: Request, res: Response) => {
-    try {
-        const userId = req.user?._id;
+  try {
+    const userId = req.user?._id;
+    if (!userId) throw new AppError("Unauthorized", 401);
 
-        if (!userId) {
-            throw new AppError("Unauthorized", 401);
-        }
+    const cacheKey = `dashboard:recentSubmissions:${userId}`;
 
-        const recentAccepted = await SubmissionModel.aggregate([
-            { $match: { userId: new mongoose.Types.ObjectId(userId), status: "Accepted" } },
-            { $sort: { createdAt: -1 } },
-            {
-                $group: {
-                    _id: "$problemId",
-                    latestSubmission: { $first: "$$ROOT" }
-                }
-            },
-            { $replaceRoot: { newRoot: "$latestSubmission" } },
-            { $limit: 15 }
-        ]);
-
-        const populated = await SubmissionModel.populate(recentAccepted, { path: "problemId" });
-        res.status(200).json(makeResponse("Got all submissions", populated));
-    } catch (error) {
-        if (error instanceof AppError) {
-            res.status(error.statusCode).json(makeResponse(error.message));
-            return;
-        }
-
-        console.error("Unexpected Error:", error);
-        res.status(500).json(makeResponse("Internal Server Error"));
+    // 1️⃣ Try cache first
+    const cached = await getCache<any[]>(cacheKey);
+    if (cached) {
+      return res.status(200).json(makeResponse("Got all submissions (cached)", cached));
     }
-}
+
+    // 2️⃣ Fetch from DB
+    const recentAccepted = await SubmissionModel.aggregate([
+      { $match: { userId: new mongoose.Types.ObjectId(userId), status: "Accepted" } },
+      { $sort: { createdAt: -1 } },
+      {
+        $group: {
+          _id: "$problemId",
+          latestSubmission: { $first: "$$ROOT" }
+        }
+      },
+      { $replaceRoot: { newRoot: "$latestSubmission" } },
+      { $limit: 15 }
+    ]);
+
+    const populated = await SubmissionModel.populate(recentAccepted, { path: "problemId" });
+
+    // 3️⃣ Save in Redis with short TTL (e.g., 30s)
+    await setCache(cacheKey, populated, 30);
+
+    res.status(200).json(makeResponse("Got all submissions", populated));
+  } catch (error) {
+    if (error instanceof AppError) {
+      return res.status(error.statusCode).json(makeResponse(error.message));
+    }
+    console.error("Unexpected Error:", error);
+    res.status(500).json(makeResponse("Internal Server Error"));
+  }
+};
