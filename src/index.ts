@@ -17,6 +17,13 @@ connectDatabase();
 app.use(express.json());
 app.use(cookieParser());
 
+// cors
+app.use(cors({
+  origin: process.env.NODE_ENV === "production"
+    ? "https://koder-frontend.vercel.app"
+    : "http://localhost:3000",
+}))
+
 // routes
 app.use("/dashboard", dashBoardRoutes);
 
