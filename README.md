@@ -1,8 +1,9 @@
 # Koder Dashboard
 
-A dedicated analytics and metrics service for the Koder platform, providing comprehensive user progress tracking, performance analytics, and submission insights for user.
+Koder-DashBoard is a backend application designed to provide a personalized dashboard experience for Koder users. It offers insights into their coding progress, including overall summary, language-wise statistics, skill-based analysis, and recent submissions. The dashboard leverages Redis caching to optimize performance and ensure quick data retrieval.
 
 ---
+**Repository URL:** [https://github.com/mohit-bhandari45/Koder-DashBoard](https://github.com/mohit-bhandari45/Koder-DashBoard)
 
 ## Table of Contents
 
@@ -24,24 +25,28 @@ A dedicated analytics and metrics service for the Koder platform, providing comp
 
 ## Features
 
-- **Progress Analytics**: Comprehensive user progress tracking and problems solved
-- **Language Statistics**: Problem-solving metrics grouped by programming language
-- **Skill-based Insights**: Progress tracking categorized by problem difficulty and topics
-- **Recent Activity**: Real-time tracking of latest accepted submissions
-- **JWT Authentication**: Secure cookie based authentication for all endpoints
-- **RESTful API**: Clean, standardized API design for easy integration
-- **MongoDB Integration**: Efficient data storage and retrieval for analytics
+*   **Progress Summary:** Displays an overview of the user's coding progress, including total problems, solved problems, submission count, acceptance rate, and difficulty-wise breakdown (Easy, Medium, Hard).
+*   **Language Statistics:** Shows the number of problems solved by the user, grouped by programming language.
+*   **Skill Statistics:**  Presents a skill-wise breakdown of the user's progress, categorized into Advanced, Intermediate, and Fundamental skills based on problem tags and a predefined skill tier mapping.
+*   **Recent Submissions:** Fetches and displays the 15 most recent accepted submissions of the user, improving performance by utilizing Redis caching.
+*   **Authentication:** Uses JWT (JSON Web Tokens) to protect routes and ensure authorized access to user-specific data using the `authCheck` middleware located in `src/modules/middlewares/auth.middleware.ts`.
+*   **Redis Caching:** Implements Redis caching for frequently accessed data (progress summary, language stats, skill stats, and recent submissions) to minimize database queries and improve response times.
 
 ---
 
 ## Tech Stack
 
-- **Node.js** (TypeScript)
-- **Express.js**
-- **MongoDB** (Mongoose)
-- **JWT** for authentication
-- **CORS** for cross-origin requests
-
+*   **Node.js:**  JavaScript runtime environment.
+*   **Express.js:**  Web application framework.
+*   **MongoDB:**  NoSQL database for storing user data, problems, and submissions.
+*   **Mongoose:**  MongoDB object modeling tool.
+*   **Redis:** In-memory data store for caching frequently accessed data.
+*   **dotenv:**  For managing environment variables.
+*   **cors:**  For enabling Cross-Origin Resource Sharing.
+*   **cookie-parser:**  For parsing cookies.
+*   **jsonwebtoken:** For generating and verifying JWT tokens.
+*   **TypeScript:**  For static typing and improved code maintainability.
+*   
 ---
 
 ## Getting Started
