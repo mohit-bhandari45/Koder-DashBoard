@@ -6,6 +6,7 @@ import { connectDatabase } from "./config/database.config";
 import cookieParser from "cookie-parser";
 import os from "os";
 import dashBoardRoutes from "./modules/dashboard/dashboard.routes";
+import adminRoutes from "./modules/admin";
 
 const PORT = process.env.PORT || 4000;
 const app = express();
@@ -26,6 +27,7 @@ app.use(cors({
 
 // routes
 app.use("/dashboard", dashBoardRoutes);
+app.use("/admin", adminRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).json({

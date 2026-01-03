@@ -118,7 +118,7 @@ export async function getLanguageWiseSolvedProblems(
                 userId: new mongoose.Types.ObjectId(userId),
                 status: "Accepted",
             },
-        },
+        }, 
         {
             $group: {
                 _id: { language: "$language", problemId: "$problemId" },
