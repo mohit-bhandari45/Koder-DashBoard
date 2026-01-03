@@ -1,7 +1,11 @@
 import { Request, Response } from "express";
 import { AppError } from "../../utils/apperror.utils";
 import { makeResponse } from "../../utils/makeResponse.utils";
-import { getLanguageWiseSolvedProblems, getProgressSummary, getSkillWiseProgress } from "./dashboard.service";
+import {
+  getLanguageWiseSolvedProblems,
+  getProgressSummary,
+  getSkillWiseProgress,
+} from "./dashboard.service";
 import SubmissionModel from "../models/submission.model";
 import mongoose from "mongoose";
 import { getCache, setCache } from "../../lib/cache.lib";
@@ -62,7 +66,7 @@ export async function getLanguageStatsHandler(req: Request, res: Response): Prom
 }
 
 /**
- * @desc Get skill-wise problem solving progress for the authenticated user
+ * @desc Get skill-wis  e problem solving progress for the authenticated user
  * @method GET
  * @route /dashboard/skill-stats
  * @access Private
@@ -117,11 +121,11 @@ export const getRecentSubmissions = async (req: Request, res: Response) => {
       {
         $group: {
           _id: "$problemId",
-          latestSubmission: { $first: "$$ROOT" }
-        }
+          latestSubmission: { $first: "$$ROOT" },
+        },
       },
       { $replaceRoot: { newRoot: "$latestSubmission" } },
-      { $limit: 15 }
+      { $limit: 15 },
     ]);
 
     const populated = await SubmissionModel.populate(recentAccepted, { path: "problemId" });
